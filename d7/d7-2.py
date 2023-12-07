@@ -4,7 +4,7 @@ import sys
 input = open(sys.argv[1]).read().strip()
 lines = input.split("\n")
 
-card_to_value = {"A": 14, "K": 13, "Q": 12, "J": 11, "T": 10, "9": 9,
+card_to_value = {"A": 14, "K": 13, "Q": 12, "J": 1, "T": 10, "9": 9,
                  "8": 8, "7": 7, "6": 6, "5": 5, "4": 4, "3": 3, "2": 2}
 
 
@@ -17,15 +17,13 @@ def get_winnings(lines):
         value = get_value(hand)
         value.append(int(bid))
         hands_values.append(value)
-    print(sorted(hands_values))
 
     total_winnings = 0
     rankings = sorted(hands_values)
     for rank, c in enumerate(rankings):
-        bid  = c[-1]
+        bid = c[-1]
         winnings = int(bid) * (rank + 1)
         total_winnings += winnings
-        print(hand, bid)
     return total_winnings
 
 
@@ -39,12 +37,28 @@ def get_value(hand):
 
 
 def get_kind(hand):
+    print(hand)
     kinds = {}
     for card in hand:
+        if card == 'J':
+            continue
         if card in kinds:
             kinds[card] += 1
         else:
             kinds[card] = 1
+    if len(kinds) > 0:
+        keymax = max(kinds, key=lambda x: kinds[x])
+        for card in hand:
+            if card != 'J':
+                continue
+            kinds[keymax] += 1
+    else:
+        for card in hand:
+            if card in kinds:
+                kinds[card] += 1
+            else:
+                kinds[card] = 1
+
     max_cards = max(kinds.values())
     # Five of a kind
     if len(kinds) == 1:
@@ -73,8 +87,6 @@ def get_kind(hand):
     if len(kinds) == 5:
         # High card
         return 0
-    print(len(kinds))
-    print('Error', hand, kinds)
 
 
 answer = get_winnings(lines)
